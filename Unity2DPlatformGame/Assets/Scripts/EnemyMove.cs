@@ -4,16 +4,32 @@ using UnityEngine;
 
 public class EnemyMove : MonoBehaviour
 {
-    Rigidbody2D rigid;
+    //Rigidbody2D rigid;
+    Vector3 pos;
+    //SpriteRenderer spriteRenderer;
+    public int nextMove;
+    float maxSpeed = 2.0f;  // 이동속도
+    float maxMove = 2.0f; // 좌,우로 이동 가능한 (x) 최대값
 
-    void Awake()
+    void Start()
     {
-        rigid = GetComponent<Rigidbody2D>();
+        pos = transform.position;
+        //spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        rigid.velocity = new Vector2(-1, rigid.velocity.y);
+        //Move
+        pos.x = maxMove * Mathf.Sin(Time.time * maxSpeed);
+        int a;
+        if(pos.x == maxMove)
+        {
+            pos.x *= -1;
+            Debug.Log("성공");
+        } else
+            Debug.Log("실패");
 
+
+        transform.position = pos;
     }
 }
