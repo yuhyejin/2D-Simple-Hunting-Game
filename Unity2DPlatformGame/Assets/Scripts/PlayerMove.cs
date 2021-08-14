@@ -78,27 +78,32 @@ public class PlayerMove : MonoBehaviour
 
             //Deactive Item
             collision.gameObject.SetActive(false);
-        }
-
-        if(collision.gameObject.tag == "Enemy")
-        {
-            //Point
-            bool isMouse = collision.gameObject.name.Contains("Enemy");
-
-            if (isMouse)
-                gameManger.stagePoint += 10;
-
-            //Deactive Item
-            collision.gameObject.SetActive(false);
-        }
+        } 
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.tag == "Enemy")
         {
-            OnDamaged(collision.transform.position);
+            //Attack
+            if(rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y)
+            {
+                OnAttack(collision.transform);
+            } else
+                OnDamaged(collision.transform.position);
         }
+    }
+
+    void OnAttack(Transform enemy)
+    {
+        //Point
+        gameManger.stagePoint += 20;
+
+        // Reaction Force
+        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+        //Enemy Die
+        EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
+        enemyMove.OnDamaged();
     }
 
     void OnDamaged(Vector2 targetPos)
