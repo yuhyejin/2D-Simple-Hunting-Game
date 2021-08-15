@@ -71,7 +71,7 @@ public class PlayerMove : MonoBehaviour
             bool isCherry = collision.gameObject.name.Contains("Cherry");
             bool isGem = collision.gameObject.name.Contains("Gem");
             if (isCherry)
-                gameManger.stagePoint += 30;
+                gameManger.stagePoint += 20;
 
             else if (isGem)
                 gameManger.stagePoint += 50;
@@ -97,7 +97,7 @@ public class PlayerMove : MonoBehaviour
     void OnAttack(Transform enemy)
     {
         //Point
-        gameManger.stagePoint += 20;
+        gameManger.stagePoint += 30;
 
         // Reaction Force
         rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
