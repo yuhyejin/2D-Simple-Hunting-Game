@@ -7,9 +7,11 @@ public class PlayerMove : MonoBehaviour
     public GameManager gameManger;
     public float maxSpeed;
     public float jumpPower;
-    Rigidbody2D rigid;
-    SpriteRenderer spriteRenderer;
-    Animator anim;
+    [SerializeField] private LayerMask ground;
+
+    private Rigidbody2D rigid;
+    private SpriteRenderer spriteRenderer;
+    private Animator anim;
 
     void Start()
     {
