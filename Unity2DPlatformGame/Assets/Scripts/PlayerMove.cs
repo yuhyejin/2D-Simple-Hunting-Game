@@ -110,6 +110,8 @@ public class PlayerMove : MonoBehaviour
 
     void OnDamaged(Vector2 targetPos)
     {
+        // Health Down
+        gameManger.health--;
         // Change Layer
         gameObject.layer = 11;
 
