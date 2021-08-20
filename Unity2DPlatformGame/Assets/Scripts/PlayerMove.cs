@@ -7,14 +7,15 @@ public class PlayerMove : MonoBehaviour
     public GameManager gameManger;
     public float maxSpeed;
     public float jumpPower;
-    [SerializeField] private LayerMask ground;
 
     private Rigidbody2D rigid;
     private SpriteRenderer spriteRenderer;
     private Animator anim;
+    private CapsuleCollider2D capsuleCollider;
 
     void Start()
     {
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
@@ -111,7 +112,7 @@ public class PlayerMove : MonoBehaviour
     void OnDamaged(Vector2 targetPos)
     {
         // Health Down
-        gameManger.health--;
+        gameManger.HealthDown();
         // Change Layer
         gameObject.layer = 11;
 
@@ -132,5 +133,20 @@ public class PlayerMove : MonoBehaviour
     {
         gameObject.layer = 10;
         spriteRenderer.color = new Color(1, 1, 1, 1);
+    }
+
+    public void OnDie()
+    {
+        //Sprite Alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+        //Sprite Flip Y
+        spriteRenderer.flipY = true;
+
+        //Colloder Disable
+        capsuleCollider.enabled = false;
+
+        //die Effect Jump
+        rigid.AddForce(Vector2.up * 30, ForceMode2D.Impulse);
     }
 }
