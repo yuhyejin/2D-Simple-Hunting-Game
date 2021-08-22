@@ -8,14 +8,17 @@ public class PlayerMove : MonoBehaviour
     public float maxSpeed;
     public float jumpPower;
 
+    private enum State { idle, running, jumping, falling}
+    private State state = State.idle;
     private Rigidbody2D rigid;
     private SpriteRenderer spriteRenderer;
     private Animator anim;
-    private CapsuleCollider2D capsuleCollider;
+    private CapsuleCollider2D capColl;
+    [SerializeField] private LayerMask platform;
 
     void Start()
     {
-        capsuleCollider = GetComponent<CapsuleCollider2D>();
+        capColl = GetComponent<CapsuleCollider2D>();
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
@@ -24,27 +27,24 @@ public class PlayerMove : MonoBehaviour
     void Update()
     {
         //Jump
-        if (Input.GetButton("Jump") && !anim.GetBool("isJumping"))
+        if (Input.GetButton("Jump") && state!=State.jumping)
         {
             rigid.velocity = new Vector2(rigid.velocity.x, maxSpeed * jumpPower);
-            anim.SetBool("isJumping", true);
+            state = State.jumping;
         }
+
+        VeloctityState();
+        anim.SetInteger("state", (int)state);
 
         //Stop Speed
-        if (Input.GetButtonUp("Horizontal"))
+        /*if(Input.GetButtonUp("Horizontal"))
         {
             rigid.velocity = new Vector2(rigid.velocity.normalized.x * 0.5f, rigid.velocity.y);
-        }
+        }*/
 
         //Direction Sprite
-        if(Input.GetButton("Horizontal"))
+        if (Input.GetButton("Horizontal"))
             spriteRenderer.flipX = Input.GetAxisRaw("Horizontal") == -1;
-
-        //Animation
-        if (rigid.velocity.normalized.x == 0)
-            anim.SetBool("isWalking", false);
-        else
-            anim.SetBool("isWalking", true);
     }
 
     void FixedUpdate()
@@ -54,16 +54,36 @@ public class PlayerMove : MonoBehaviour
         rigid.velocity = new Vector2(maxSpeed * h, rigid.velocity.y);
 
         //Landing Platform
-        if(rigid.velocity.y < 0)
+        if (rigid.velocity.y < 0)
         {
             Debug.DrawRay(rigid.position, Vector3.down, new Color(0, 1, 0));
             RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector3.down, 1, LayerMask.GetMask("Platform"));
             if(rayHit.collider != null)
             {
-                if(rayHit.distance < 0.9f)
-                    anim.SetBool("isJumping", false);
+                if (rayHit.distance < 0.9f)
+                    state = State.falling;
             }
         }
+    }
+    
+    private void VeloctityState()
+    {
+        if(state == State.jumping)
+        {
+            if (rigid.velocity.y < .1f)
+                state = State.falling;
+        }
+
+        else if(state == State.falling)
+        {
+            if (capColl.IsTouchingLayers(platform))
+                state = State.idle;
+        }
+
+        if (rigid.velocity.normalized.x == 0)
+            state = State.idle;
+        else
+            state = State.running;
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -103,7 +123,7 @@ public class PlayerMove : MonoBehaviour
         gameManger.stagePoint += 30;
 
         // Reaction Force
-        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+        rigid.AddForce(Vector2.up * 6f, ForceMode2D.Impulse);
         //Enemy Die
         EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
         enemyMove.OnDamaged();
@@ -144,7 +164,7 @@ public class PlayerMove : MonoBehaviour
         spriteRenderer.flipY = true;
 
         //Colloder Disable
-        capsuleCollider.enabled = false;
+        capColl.enabled = false;
 
         //die Effect Jump
         rigid.AddForce(Vector2.up * 30, ForceMode2D.Impulse);
