@@ -14,7 +14,6 @@ public class PlayerMove : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Animator anim;
     private CapsuleCollider2D capColl;
-    [SerializeField] private LayerMask platform;
 
     void Start()
     {
@@ -72,12 +71,6 @@ public class PlayerMove : MonoBehaviour
         {
             if (rigid.velocity.y < .1f)
                 state = State.falling;
-        }
-
-        else if(state == State.falling)
-        {
-            if (capColl.IsTouchingLayers(platform))
-                state = State.idle;
         }
 
         if (rigid.velocity.normalized.x == 0)
