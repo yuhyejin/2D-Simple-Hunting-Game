@@ -26,7 +26,7 @@ public class PlayerMove : MonoBehaviour
     void Update()
     {
         //Jump
-        if (Input.GetButton("Jump") && state!=State.jumping)
+        if (Input.GetButton("Jump") && !anim.("isJumping", true)
         {
             rigid.velocity = new Vector2(rigid.velocity.x, maxSpeed * jumpPower);
             state = State.jumping;
